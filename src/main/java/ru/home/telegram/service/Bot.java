@@ -1,4 +1,4 @@
-package ru.home.telegram;
+package ru.home.telegram.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.abilitybots.api.bot.AbilityBot;
@@ -11,8 +11,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 public class Bot extends AbilityBot {
 
-	protected Bot(String botToken, String botUsername, DefaultBotOptions options) {
+	private String botToken;
+	private String botUsername;
+
+	public Bot(String botToken, String botUsername, DefaultBotOptions options) {
 		super(botToken, botUsername, options);
+		this.botToken = botToken;
+		this.botUsername = botUsername;
 	}
 
 	public int creatorId() {
@@ -39,12 +44,12 @@ public class Bot extends AbilityBot {
 
 	@Override
 	public String getBotUsername() {
-		return "MyFirstWeatherBot";
+		return botUsername;
 	}
 
 
 	@Override
 	public String getBotToken() {
-		return "658153349:AAGeJ2Ve88cQHo25M5gCMPBNjpQWaRdJUmg";
+		return botToken;
 	}
 }
