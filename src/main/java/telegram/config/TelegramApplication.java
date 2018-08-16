@@ -1,4 +1,4 @@
-package ru.home.telegram.config;
+package telegram.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
@@ -7,15 +7,22 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-import ru.home.telegram.config.properties.AppPropertiesConfig;
-import ru.home.telegram.service.Bot;
+import telegram.config.properties.AppPropertiesConfig;
+import telegram.service.Bot;
+import telegram.service.BotService;
 
 @Slf4j
+@ComponentScan(basePackageClasses = BotService.class)
 @SpringBootApplication
 public class TelegramApplication {
 
@@ -39,6 +46,7 @@ public class TelegramApplication {
 			Bot bot = new Bot(appPropertiesConfig.getBot().getToken(), appPropertiesConfig.getBot().getName(), botOptions);
 
 			botsApi.registerBot(bot);
+			log.info("Bot was registered");
 			return bot;
 		} catch (TelegramApiRequestException e) {
 			log.error(e.getMessage());
@@ -46,9 +54,23 @@ public class TelegramApplication {
 		return null;
 	}
 
+	@Bean(name = "yandexRestTemplate")
+	public RestTemplate yandexRestTemplate(AppPropertiesConfig appPropertiesConfig) {
+		RestTemplate restTemplate = new RestTemplate(createYandexClientHttpRequestFactory(appPropertiesConfig));
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+		return restTemplate;
+	}
+
 	@Bean
 	@ConfigurationProperties
 	AppPropertiesConfig appPropertiesConfig() {
 		return new AppPropertiesConfig();
+	}
+
+	private BufferingClientHttpRequestFactory createYandexClientHttpRequestFactory(AppPropertiesConfig appPropertiesConfig) {
+		HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+		httpComponentsClientHttpRequestFactory.setConnectTimeout(appPropertiesConfig.getYandex().getConnectionTimeout());
+		httpComponentsClientHttpRequestFactory.setReadTimeout(appPropertiesConfig.getYandex().getReadTimeout());
+		return new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory);
 	}
 }

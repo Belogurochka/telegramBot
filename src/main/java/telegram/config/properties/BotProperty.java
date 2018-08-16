@@ -1,4 +1,4 @@
-package ru.home.telegram.config.properties;
+package telegram.config.properties;
 
 import lombok.Data;
 

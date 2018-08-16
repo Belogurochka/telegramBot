@@ -5,3 +5,11 @@ bot:
 proxy:
   host: 195.201.124.134
   port: 3128
+
+yandex:
+  connectionTimeout: 5000
+  readTimeout: 5000
+  token: 3320837c-00df-4160-805b-3552e66d36b0
+  url: https://api.weather.yandex.ru/v1/forecast
+  lat: 55.753960
+  lon: 37.620393

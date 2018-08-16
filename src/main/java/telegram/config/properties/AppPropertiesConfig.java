@@ -1,4 +1,4 @@
-package ru.home.telegram.config.properties;
+package telegram.config.properties;
 
 
 import lombok.Data;
@@ -9,4 +9,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AppPropertiesConfig {
 	private BotProperty bot;
 	private ProxyProperty proxy;
+	private YandexProperty yandex;
 }
