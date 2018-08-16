@@ -9,14 +9,17 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegram.model.YandexWeatherResponse;
+import telegram.model.WeatherResponse;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class Bot extends AbilityBot {
 
 	private String botToken;
 	private String botUsername;
-	private YandexWeatherService yandexWeatherService;
+	private WeatherService weatherService;
 
 	public Bot(String botToken, String botUsername, DefaultBotOptions options) {
 		super(botToken, botUsername, options);
@@ -34,44 +37,45 @@ public class Bot extends AbilityBot {
 			Message message = update.getMessage();
 			if (message != null && message.hasText()) {
 				SendMessage mess = new SendMessage().setChatId(update.getMessage().getChatId());
-				switch (message.getText()) {
-					case ("/help"): {
-						mess.setText("Привет, я робот, могу исполнять команды:\n" +
-								"/help - вывести эту справку\n" +
-								"/прогноз - прогноз погоды в Москве на сутки");
-						break;
+				if (message.getText().matches("^/help")) {
+					mess.setText("Привет, я робот, могу исполнять команды:\n" +
+							"/help - вывести эту справку\n" +
+							"/forecast - прогноз погоды, /forecast {Город} {кол-во дней} ");
+				} else if (message.getText().matches("^/forecast.*")) {
+					String[] splited = message.getText().split("\\s+");
+					String city=null;
+					String daysCount=null;
+					WeatherResponse weatherResponse;
+					if (splited.length==1) {
+						mess.setText("Необходимо ввести город для прогноза");
+					} else {
+						city = splited[1];
+						if (splited.length>2) {
+							daysCount=splited[2];
+						}
 					}
-					case ("/прогноз"): {
-						YandexWeatherResponse yandexWeatherResponse = yandexWeatherService.sendRequest();
-						StringBuilder stringBuilder = new StringBuilder();
-						yandexWeatherResponse.getYandexForecasts().forEach(forecast-> stringBuilder.append("Прогноз на ")
-								.append(forecast.getDate())
-								.append("\n")
-								.append("Ночная температура - ")
-								.append(forecast.getNight().getTemp())
-								.append("\n")
-								.append("Ночная скорость ветра - ")
-								.append(forecast.getNight().getWindSpeed())
-								.append("\n")
-								.append("Ночная погода - ")
-								.append(forecast.getNight().getCondition())
-								.append("\n")
-								.append("Дневная температура - ")
-								.append(forecast.getDay().getTemp())
-								.append("\n")
-								.append("Дневная скорость ветра - ")
-								.append(forecast.getDay().getWindSpeed())
-								.append("\n")
-								.append("Дневная погода - ")
-								.append(forecast.getDay().getCondition())
-								.append("\n"));
-						mess.setText(stringBuilder.toString().replaceFirst("\n$",""));
-						break;
+					if (StringUtils.isEmpty(daysCount) || Integer.valueOf(daysCount) < 1) {
+						weatherResponse = weatherService.getCurrentWeather(city);
+					} else {
+						weatherResponse = weatherService.getForecastWeather(city, Integer.valueOf(daysCount));
 					}
-					default :{
-						mess.setText("Неправильный код операции");
-						break;
-					}
+					StringBuilder stringBuilder = new StringBuilder();
+					weatherResponse.getList().forEach(forecast -> stringBuilder.append("Прогноз на ")
+							.append(forecast.getDate().toString().replace("T",""))
+							.append("\n")
+							.append("Температура - ")
+							.append(forecast.getTemp()).append("°")
+							.append("\n")
+							.append("Cкорость ветра - ")
+							.append(forecast.getWindSpeed()).append(" м/с")
+							.append("\n")
+							.append("Погода - ")
+							.append(forecast.getCondition())
+							.append("\n")
+							.append("\n"));
+					mess.setText(stringBuilder.toString().replaceFirst("\n\n$", ""));
+				} else {
+					mess.setText("Неправильный код операции");
 				}
 
 				if (StringUtils.isNotEmpty(mess.getText())) {
@@ -84,6 +88,7 @@ public class Bot extends AbilityBot {
 				}
 			}
 		}
+
 	}
 
 
@@ -99,7 +104,7 @@ public class Bot extends AbilityBot {
 	}
 
 	@Autowired
-	public void setYandexWeatherService(YandexWeatherService yandexWeatherService) {
-		this.yandexWeatherService = yandexWeatherService;
+	public void setWeatherService(WeatherService weatherService) {
+		this.weatherService = weatherService;
 	}
 }

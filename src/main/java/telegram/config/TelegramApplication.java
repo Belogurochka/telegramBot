@@ -54,9 +54,9 @@ public class TelegramApplication {
 		return null;
 	}
 
-	@Bean(name = "yandexRestTemplate")
-	public RestTemplate yandexRestTemplate(AppPropertiesConfig appPropertiesConfig) {
-		RestTemplate restTemplate = new RestTemplate(createYandexClientHttpRequestFactory(appPropertiesConfig));
+	@Bean(name = "weatherRestTemplate")
+	public RestTemplate weatherRestTemplate(AppPropertiesConfig appPropertiesConfig) {
+		RestTemplate restTemplate = new RestTemplate(createWeatherClientHttpRequestFactory(appPropertiesConfig));
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 		return restTemplate;
 	}
@@ -67,10 +67,10 @@ public class TelegramApplication {
 		return new AppPropertiesConfig();
 	}
 
-	private BufferingClientHttpRequestFactory createYandexClientHttpRequestFactory(AppPropertiesConfig appPropertiesConfig) {
+	private BufferingClientHttpRequestFactory createWeatherClientHttpRequestFactory(AppPropertiesConfig appPropertiesConfig) {
 		HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-		httpComponentsClientHttpRequestFactory.setConnectTimeout(appPropertiesConfig.getYandex().getConnectionTimeout());
-		httpComponentsClientHttpRequestFactory.setReadTimeout(appPropertiesConfig.getYandex().getReadTimeout());
+		httpComponentsClientHttpRequestFactory.setConnectTimeout(appPropertiesConfig.getWeather().getConnectionTimeout());
+		httpComponentsClientHttpRequestFactory.setReadTimeout(appPropertiesConfig.getWeather().getReadTimeout());
 		return new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory);
 	}
 }

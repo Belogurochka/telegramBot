@@ -9,5 +9,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AppPropertiesConfig {
 	private BotProperty bot;
 	private ProxyProperty proxy;
-	private YandexProperty yandex;
+	private WeatherProperty weather;
 }
