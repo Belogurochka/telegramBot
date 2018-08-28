@@ -11,3 +11,10 @@ weather:
   readTimeout: 5000
   token: 6a185e4733913747ba365735273030a0
   url: http://api.openweathermap.org/data/2.5/
+
+post:
+  connectionTimeout: 5000
+  readTimeout: 5000
+  url: https://tracking.russianpost.ru/rtm34?wsdl
+  login: UAqSeIyMRAdHeL
+  password: 6mUOF9j9fT92

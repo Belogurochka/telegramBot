@@ -3,13 +3,14 @@ package telegram.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
 @Data
-public class WeatherDateForecast {
+public class WeatherDateForecast implements Serializable {
 	private static String ISO_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	private static final DateTimeFormatter isoFormatter = DateTimeFormatter.ofPattern(ISO_FORMAT);
 

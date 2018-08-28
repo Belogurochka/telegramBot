@@ -10,4 +10,5 @@ public class AppPropertiesConfig {
 	private BotProperty bot;
 	private ProxyProperty proxy;
 	private WeatherProperty weather;
+	private PostProperty post;
 }

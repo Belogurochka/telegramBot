@@ -22,6 +22,9 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<lombok.version>1.16.18</lombok.version>
+		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
+		<spring-ws-core.version>2.4.1.RELEASE</spring-ws-core.version>
 	</properties>
 
 	<dependencies>
@@ -56,6 +59,16 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
+			<version>4.3.10.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-core</artifactId>
+			<version>${spring-ws-core.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -63,6 +76,58 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>${maven-antrun-plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<echo message="Creating src/generated/java"/>
+								<mkdir dir="./src/generated/java"/>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>${exec-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>russianPost</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>xjc</executable>
+							<longModulepath>false</longModulepath>
+							<arguments>
+								<argument>-extension</argument>
+								<argument>-readOnly</argument>
+								<argument>-quiet</argument>
+								<argument>-mark-generated</argument>
+								<argument>-target</argument>
+								<argument>2.1</argument>
+								<argument>-d</argument>
+								<argument>src/generated/java</argument>
+								<argument>src/main/resources/wsdl/rtm34_wsdl.xml</argument>
+								<argument>-wsdl</argument>
+								<argument>-p</argument>
+								<argument>telegram.generated.russianPost</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
